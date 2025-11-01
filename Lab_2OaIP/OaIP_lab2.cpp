@@ -1,114 +1,78 @@
-#include <iostream>
-#include <string>
-#include <vector>
+﻿#include <iostream>
+#include <cstring>
+#include <cctype>
 
 using namespace std;
 
-// Функция для разбиения строки на слова
-vector<string> splitString(const string& str) {
-    vector<string> words;
-    string currentWord;
-    
-    for (char c : str) {
-        if (c == ' ') {
-            if (!currentWord.empty()) {
-                words.push_back(currentWord);
-                currentWord.clear();
-            }
-        } else {
-            currentWord += c;
+void toLowerString(char* str) {
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (isupper(str[i])) {
+            str[i] = tolower(str[i]);
         }
     }
-    
-    // Добавляем последнее слово, если оно есть
-    if (!currentWord.empty()) {
-        words.push_back(currentWord);
-    }
-    
-    return words;
-}
-
-// Функция для преобразования строки в верхний регистр
-string toUpper(string str) {
-    for (char& c : str) {
-        if (c >= 'a' && c <= 'z') {
-            c = c - 'a' + 'A';
-        }
-    }
-    return str;
-}
-
-bool isD(char c) {
-    return c == 'd' || c == 'D';
-}
-
-bool endsWithB(const string& word) {
-    if (word.empty()) return false;
-    char lastChar = word[word.length() - 1];
-    return lastChar == 'b' || lastChar == 'B';
 }
 
 int main() {
-    string input;
+    char inputString[1000];
     cout << "Введите строку из 10 слов на латинице: ";
-    getline(cin, input);
-//тут на строки дроблю строку
-    vector<string> words = splitString(input);
+    cin.getline(inputString, 1000);
 
-    int count_b = 0;
-    for (const auto& w : words) {
-        if (endsWithB(w)) {
-            count_b++;
-        }
+    // Слова на 'a'
+    int countEndingWithA = 0;
+    char* words[100];
+    int wordCount = 0;
+
+    char* token = strtok(inputString, " ");
+    while (token != nullptr) {
+        words[wordCount++] = token;
+        token = strtok(nullptr, " ");
     }
 
-    size_t max_len = 0;
-    for (const auto& w : words) {
-        if (w.length() > max_len) {
-            max_len = w.length();
+    for (int i = 0; i < wordCount; i++) {
+        int len = strlen(words[i]);
+        if (len > 0 && tolower(words[i][len - 1]) == 'a') {
+            countEndingWithA++;
         }
     }
+    cout << "1. Слов, оканчивающихся на 'a': " << countEndingWithA << endl;
 
-    int count_d = 0;
-    if (!words.empty()) {
-        string last_word = words.back();
-        for (char c : last_word) {
-            if (isD(c)) {
-                count_d++;
+    //Длина самого короткого слова
+    int minLength = strlen(words[0]);
+    for (int i = 1; i < wordCount; i++) {
+        int len = strlen(words[i]);
+        if (len < minLength) {
+            minLength = len;
+        }
+    }
+    cout << "2. Длина самого короткого слова: " << minLength << endl;
+
+    //Количество 'b' во втором слове
+    int countB = 0;
+    if (wordCount >= 2) {
+        char* secondWord = words[1];
+        for (int i = 0; secondWord[i] != '\0'; i++) {
+            if (tolower(secondWord[i]) == 'b') {
+                countB++;
             }
         }
     }
+    cout << "3. Количество букв 'b' во втором слове: " << countB << endl;
 
-    string upper_str = toUpper(input);
+    //Замена заглавных букв на строчные
+    char modifiedString[1000];
+    strcpy(modifiedString, inputString);
+    toLowerString(modifiedString);
+    cout << "4. Строка в нижнем регистре: " << modifiedString << endl;
 
-    int count_match = 0;
-    for (const auto& w : words) {
-        if (w.length() >= 4 && w[1] == w[w.length() - 2]) {
-            count_match++;
+    //Слова с одинаковыми первым и последним символом
+    int countFirstLast = 0;
+    for (int i = 0; i < wordCount; i++) {
+        int len = strlen(words[i]);
+        if (len > 0 && tolower(words[i][0]) == tolower(words[i][len - 1])) {
+            countFirstLast++;
         }
     }
-    string longest_common;
-    for (int i = 0; i < words.size(); ++i) {
-        for (int j = i + 1; j < words.size(); ++j) {
-            const string& word1 = words[i];
-            const string& word2 = words[j];
-            for (size_t start = 0; start < word1.length(); ++start) {
-                for (size_t length = 1; length <= word1.length() - start; ++length) {
-                    string substring = word1.substr(start, length);
-                    if (word2.find(substring) != string::npos && substring.length() > longest_common.length()) {
-                        longest_common = substring;
-                    }
-                }
-            }
-        }
-    }
+    cout << "Вопрос 5. Слов с одинаковыми первым и последним символом: " << countFirstLast << endl;
 
-    cout << "\nРезультаты:\n";
-    cout << "1. Слов на 'b': " << count_b << endl;
-    cout << "2. Самое длинное слово: " << max_len << " символов" << endl;
-    cout << "3. Букв 'd' в последнем слове: " << count_d << endl;
-    cout << "4. Строка в верхнем регистре: " << upper_str << endl;
-    cout << "5. Слов с совпадающими 2-м и предпоследним символом: " << count_match << endl;
-    cout << "6. Самая длинная общая подстрока: \"" << longest_common << "\"" << endl;
-
+    return 0;
 }
