@@ -2,7 +2,6 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <sstream>
 
 using namespace std;
 
@@ -169,7 +168,7 @@ void outputProductsByPrice() {
 }
 
 int main() {
-    // Здесь почисмтил файл перед новым запуском проги
+    // Здесь почисмтил файл логов отчета перед новым запуском проги
     ofstream clearFile("output.txt");
     clearFile.close();
 
@@ -202,7 +201,7 @@ int main() {
             writeToOutput("Program finished.");
             break;
         default:
-            cout << "Invalid choice. Please try again." << endl;
+            cout << "Wrong choice. Please try again." << endl;
         }
     } while (choice != 0);
 
